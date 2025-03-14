@@ -15,9 +15,7 @@
             "ssm:PutParameter",
             "ssm:GetParameter",
             "kms:Decrypt",
-            "sqs:ReceiveMessage",
-            "sqs:DeleteMessage",
-            "sqs:GetQueueAttributes"
+            "s3:PutObject"
           ],
           "Effect": "Allow",
           "Resource": "*"
@@ -28,35 +26,26 @@
     "resource_type": "iam_policy",
     "tags": {}
   },
-  "async_queue": {
-    "resource_type": "sqs_queue",
-    "fifo_queue": false,
-    "visibility_timeout": 600,
-    "delay_seconds": 0,
-    "maximum_message_size": 1024,
-    "message_retention_period": 60,
-    "receive_message_wait_time_seconds": 0,
+  "uuid_trigger": {
+    "resource_type": "cloudwatch_rule",
+    "rule_type": "schedule",
+    "tags": {},
+    "expression": "rate(1 minute)"
+  },
+  "${target_bucket}": {
+    "resource_type": "s3_bucket",
+    "acl": "private",
+    "cors": [],
     "policy": {},
-    "redrive_policy": {},
-    "content_based_deduplication": false,
+    "public_access_block": {
+      "block_public_acls": true,
+      "ignore_public_acls": true,
+      "block_public_policy": true,
+      "restrict_public_buckets": true
+    },
     "tags": {}
   },
-  "lambda_topic": {
-    "resource_type": "sns_topic",
-    "region": "eu-west-1",
-    "event_sources": [],
-    "tags": {}
-  },
-  "sqs_handler-role": {
-    "predefined_policies": [],
-    "principal_service": "lambda",
-    "custom_policies": [
-      "lambda-basic-execution"
-    ],
-    "resource_type": "iam_role",
-    "tags": {}
-  },
-  "sns_handler-role": {
+  "uuid_generator-role": {
     "predefined_policies": [],
     "principal_service": "lambda",
     "custom_policies": [
